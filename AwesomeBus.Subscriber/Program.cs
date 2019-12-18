@@ -1,12 +1,44 @@
-﻿using System;
+﻿using Amazon.SQS;
+using Microsoft.Extensions.Configuration;
+using NServiceBus;
+using System;
+using System.Threading.Tasks;
 
 namespace AwesomeBus.Subscriber
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.Title = "Awesome.Bus.Subscriber";
+
+            #region configuration
+            IConfiguration Configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
+                .Build();
+            #endregion
+
+
+
+            #region NServiceBusIntegration
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Publisher");
+            endpointConfiguration.EnableInstallers();
+            var transport = endpointConfiguration.UseTransport<SqsTransport>();
+
+
+            transport.ClientFactory(() => Configuration.GetAWSOptions().CreateServiceClient<IAmazonSQS>());
+
+            endpointConfiguration.UsePersistence<InMemoryPersistence>();
+            endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
+            endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
+            var endpointInstance = await Endpoint.Start(endpointConfiguration);
+            Console.WriteLine("Endpoint started ..... Press any key to exit");
+            Console.ReadKey();
+            await endpointInstance.Stop().ConfigureAwait(false);
+            #endregion
+
         }
     }
 }
