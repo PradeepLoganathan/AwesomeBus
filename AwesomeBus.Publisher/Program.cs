@@ -1,15 +1,11 @@
-﻿using Amazon;
-using Amazon.Runtime;
-using Amazon.Runtime.CredentialManagement;
-using Amazon.SQS;
-using Amazon.SQS.Model;
+﻿using Amazon.SQS;
 using AwesomeBus.MessageContracts;
 using Microsoft.Extensions.Configuration;
 using NServiceBus;
 using System;
 using System.Threading.Tasks;
 
-namespace AwesomeBus
+namespace AwesomeBus.Publisher
 {
     class Program
     {
@@ -38,18 +34,28 @@ namespace AwesomeBus
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
+            
+            var routing = transport.Routing();
+            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.Subscriber");
+            
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
-            var customerCreated = new CustomerCreated
+            #endregion
+
+            #region sendcommand
+
+            var createCustomerCommand = new CreateCustomerCommand
             {
-                CustomerId = Guid.NewGuid()
+                FirstName = "pradeep",
+                LastName = "loganathan"
             };
 
-            await endpointInstance.Publish(customerCreated);
-                   
-            Console.WriteLine("Endpoint started ..... Press any key to exit");
+            await endpointInstance.Send(createCustomerCommand);
+            #endregion
+
+            Console.WriteLine("Publisher Endpoint started ..... Press any key to exit");
             Console.ReadKey();
             await endpointInstance.Stop().ConfigureAwait(false);
-            #endregion
+            
 
         }
     }

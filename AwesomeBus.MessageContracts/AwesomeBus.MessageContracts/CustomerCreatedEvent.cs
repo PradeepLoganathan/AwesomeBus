@@ -3,7 +3,8 @@ using System;
 
 namespace AwesomeBus.MessageContracts
 {
-    public class CreateCustomer: IMessage
+    public class CustomerCreatedEvent:IEvent
     {
+        public Guid CustomerId { get; set; }
     }
 }

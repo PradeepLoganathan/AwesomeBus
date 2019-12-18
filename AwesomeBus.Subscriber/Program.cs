@@ -1,4 +1,5 @@
 ﻿using Amazon.SQS;
+using AwesomeBus.MessageContracts;
 using Microsoft.Extensions.Configuration;
 using NServiceBus;
 using System;
@@ -23,7 +24,7 @@ namespace AwesomeBus.Subscriber
 
 
             #region NServiceBusIntegration
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Publisher");
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Subscriber");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 
@@ -33,10 +34,12 @@ namespace AwesomeBus.Subscriber
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
+
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
-            Console.WriteLine("Endpoint started ..... Press any key to exit");
+            
+            Console.WriteLine("subscriber Endpoint started ..... Press any key to exit");
             Console.ReadKey();
-            await endpointInstance.Stop().ConfigureAwait(false);
+            await endpointInstance.Stop();
             #endregion
 
         }
