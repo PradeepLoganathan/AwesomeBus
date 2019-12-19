@@ -5,13 +5,13 @@ using NServiceBus;
 using System;
 using System.Threading.Tasks;
 
-namespace AwesomeBus.Subscriber
+namespace AwesomeBus.CustomerWorker
 {
     class Program
     {
         static async Task Main(string[] args)
         {
-            Console.Title = "Awesome.Bus.Subscriber";
+            Console.Title = "Awesome.Bus.CustomerWorker";
 
             #region configuration
             IConfiguration Configuration = new ConfigurationBuilder()
@@ -24,12 +24,11 @@ namespace AwesomeBus.Subscriber
 
 
             #region NServiceBusIntegration
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Subscriber");
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.CustomerCommandQueue");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 
-            var routing = transport.Routing();
-            routing.RegisterPublisher(typeof(CustomerCreatedEvent).Assembly, publisherEndpoint: "AwesomeBus.Subscriber");
+            
 
             transport.ClientFactory(() => Configuration.GetAWSOptions().CreateServiceClient<IAmazonSQS>());
 
@@ -39,7 +38,7 @@ namespace AwesomeBus.Subscriber
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
             
-            Console.WriteLine("subscriber Endpoint started ..... Press any key to exit");
+            // Console.WriteLine("CustomerWorker Endpoint started ..... Press any key to exit");
             Console.ReadKey();
             await endpointInstance.Stop();
             #endregion

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AwesomeBus.Helper\AwesomeBus.Helper.csproj" />
     <ProjectReference Include="..\AwesomeBus.MessageContracts\AwesomeBus.MessageContracts\AwesomeBus.MessageContracts.csproj" />
   </ItemGroup>
 

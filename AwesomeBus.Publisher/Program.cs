@@ -5,6 +5,8 @@ using NServiceBus;
 using System;
 using System.Threading.Tasks;
 
+using static AwesomeBus.Helper.HelperClass;
+
 namespace AwesomeBus.Publisher
 {
     class Program
@@ -36,8 +38,9 @@ namespace AwesomeBus.Publisher
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
             
             var routing = transport.Routing();
-            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.Subscriber");
-            
+            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerCommandQueue");
+            routing.RouteToEndpoint(typeof(CreateOrderCommand), "AwesomeBus.OrderCommandQueue");
+
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
             #endregion
 
@@ -45,18 +48,28 @@ namespace AwesomeBus.Publisher
 
             var createCustomerCommand = new CreateCustomerCommand
             {
-                FirstName = "pradeep",
-                LastName = "loganathan"
+                FirstName = "test",
+                LastName = "lastnametest"
             };
 
-            await endpointInstance.Send(createCustomerCommand);
+            await endpointInstance.Send(createCustomerCommand);            
+            WriteToConsole($"Fired {nameof(CreateCustomerCommand)}", ConsoleColor.Yellow);
+
+            var createOrderCommand = new CreateOrderCommand
+            {
+                OrderID = Guid.NewGuid(),
+                OrderDate = DateTime.UtcNow
+            };
+
+            await endpointInstance.Send(createOrderCommand);
+            WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
             #endregion
 
-            Console.WriteLine("Publisher Endpoint started ..... Press any key to exit");
+            WriteToConsole("Publisher Endpoint started ..... Press any key to exit", ConsoleColor.Yellow);
             Console.ReadKey();
-            await endpointInstance.Stop().ConfigureAwait(false);
-            
 
+
+            await endpointInstance.Stop().ConfigureAwait(false);
         }
     }
 }

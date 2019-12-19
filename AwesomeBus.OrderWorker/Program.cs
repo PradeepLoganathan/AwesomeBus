@@ -5,13 +5,13 @@ using NServiceBus;
 using System;
 using System.Threading.Tasks;
 
-namespace AwesomeBus.SecondSubscriber
+namespace AwesomeBus.OrderWorker
 {
     class Program
     {
         static async Task Main(string[] args)
         {
-            Console.Title = "Awesome.Bus.Second.Subscriber";
+            Console.Title = "Awesome.Bus.Second.OrderWorker";
 
             #region configuration
             IConfiguration Configuration = new ConfigurationBuilder()
@@ -22,12 +22,12 @@ namespace AwesomeBus.SecondSubscriber
             #endregion
 
             #region NServiceBusIntegration
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.SecondSubscriber");
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.OrderCommandQueue");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 
-            var routing = transport.Routing();
-            routing.RegisterPublisher(typeof(CustomerCreatedEvent).Assembly, publisherEndpoint: "AwesomeBus.Subscriber");
+            //var routing = transport.Routing();
+            //routing.RegisterPublisher(typeof(OrderCreatedEvent).Assembly, publisherEndpoint: "AwesomeBus.OrderEventQueue");
 
             transport.ClientFactory(() => Configuration.GetAWSOptions().CreateServiceClient<IAmazonSQS>());
 
@@ -37,7 +37,7 @@ namespace AwesomeBus.SecondSubscriber
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
 
-            Console.WriteLine("second subscriber Endpoint started ..... Press any key to exit");
+            // Console.WriteLine("second subscriber Endpoint started ..... Press any key to exit");
             Console.ReadKey();
             await endpointInstance.Stop();
             #endregion
