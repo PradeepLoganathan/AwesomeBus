@@ -5,13 +5,13 @@ using NServiceBus;
 using System;
 using System.Threading.Tasks;
 
-namespace AwesomeBus.Subscriber
+namespace AwesomBus.ThirdSubscriber
 {
     class Program
     {
         static async Task Main(string[] args)
         {
-            Console.Title = "Awesome.Bus.Subscriber";
+            Console.Title = "Awesome.Bus.Third.Subscriber";
 
             #region configuration
             IConfiguration Configuration = new ConfigurationBuilder()
@@ -21,10 +21,8 @@ namespace AwesomeBus.Subscriber
                 .Build();
             #endregion
 
-
-
             #region NServiceBusIntegration
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Subscriber");
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.ThirdSubscriber");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 
@@ -38,12 +36,12 @@ namespace AwesomeBus.Subscriber
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
-            
-            Console.WriteLine("subscriber Endpoint started ..... Press any key to exit");
+
+            Console.WriteLine("Thiird subscriber Endpoint started ..... Press any key to exit");
             Console.ReadKey();
             await endpointInstance.Stop();
             #endregion
-
         }
     }
 }
+
