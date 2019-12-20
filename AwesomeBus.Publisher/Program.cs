@@ -36,7 +36,8 @@ namespace AwesomeBus.Publisher
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
-            
+            endpointConfiguration.SendOnly();
+
             var routing = transport.Routing();
             routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerCommandQueue");
             routing.RouteToEndpoint(typeof(CreateOrderCommand), "AwesomeBus.OrderCommandQueue");
@@ -45,6 +46,8 @@ namespace AwesomeBus.Publisher
             #endregion
 
             #region sendcommand
+
+            await Task.Delay(2000);
 
             var createCustomerCommand = new CreateCustomerCommand
             {

@@ -11,7 +11,7 @@ namespace AwesomeBus.Helper
             lock(syncLock)
             {
                 Console.ForegroundColor = consoleColor;
-                Console.WriteLine($"{DateTime.Now} : {message}");
+                Console.WriteLine($"{DateTime.Now.ToLongTimeString()} : {message}");
 
                 Console.ResetColor();
             }

@@ -33,7 +33,8 @@ namespace AwesomBus.ThirdSubscriber
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
 
             var routing = transport.Routing();
-            routing.RegisterPublisher(typeof(CustomerCreatedEvent).Assembly, publisherEndpoint: "AwesomeBus.EventQueue");
+            routing.RegisterPublisher(typeof(CustomerCreatedEvent), publisherEndpoint: "AwesomeBus.CustomerCommandQueue");
+            routing.RegisterPublisher(typeof(OrderCreatedEvent), publisherEndpoint: "AwesomeBus.OrderCommandQueue");
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
 

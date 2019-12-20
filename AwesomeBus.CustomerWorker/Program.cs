@@ -35,7 +35,8 @@ namespace AwesomeBus.CustomerWorker
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
-
+            
+            
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
             
             // Console.WriteLine("CustomerWorker Endpoint started ..... Press any key to exit");
