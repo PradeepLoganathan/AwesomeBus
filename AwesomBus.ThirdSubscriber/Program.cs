@@ -31,6 +31,7 @@ namespace AwesomBus.ThirdSubscriber
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             var routing = transport.Routing();
             routing.RegisterPublisher(typeof(CustomerCreatedEvent), publisherEndpoint: "AwesomeBus.CustomerCommandQueue");

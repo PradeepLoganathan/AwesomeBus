@@ -26,12 +26,12 @@ namespace AwesomeBus.OrderWorker
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 
-            //var routing = transport.Routing();
-            //routing.RegisterPublisher(typeof(OrderCreatedEvent).Assembly, publisherEndpoint: "AwesomeBus.OrderEventQueue");
+            
 
             transport.ClientFactory(() => Configuration.GetAWSOptions().CreateServiceClient<IAmazonSQS>());
 
-            endpointConfiguration.UsePersistence<InMemoryPersistence>();
+            //endpointConfiguration.UsePersistence<InMemoryPersistence>();
+            transport.DisablePublishing();
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
 

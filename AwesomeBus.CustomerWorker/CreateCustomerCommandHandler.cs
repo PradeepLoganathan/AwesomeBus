@@ -7,11 +7,11 @@ using static AwesomeBus.Helper.HelperClass;
 
 namespace AwesomeBus.CustomerWorker
 {
-    class CreateCustomerCommandHandler : IHandleMessages<CreateCustomerCommand>
+    class CreateCustomerCommandHandler : IHandleMessages<ICreateCustomerCommand>
     {
-        public async Task Handle(CreateCustomerCommand message, IMessageHandlerContext context)
+        public async Task Handle(ICreateCustomerCommand message, IMessageHandlerContext context)
         {
-            WriteToConsole($"Handler fired for {nameof(CreateCustomerCommand)} - {message.FirstName}", ConsoleColor.Green);
+            WriteToConsole($"Handler fired for {nameof(ICreateCustomerCommand)} - {message.FirstName}", ConsoleColor.Green);
 
             var customerCreated = new CustomerCreatedEvent
             {

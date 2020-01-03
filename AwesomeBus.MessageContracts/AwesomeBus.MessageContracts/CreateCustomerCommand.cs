@@ -2,9 +2,9 @@
 
 namespace AwesomeBus.MessageContracts
 {
-    public class CreateCustomerCommand: ICommand
+    public interface ICreateCustomerCommand: ICommand
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+         string FirstName { get; set; }
+         string LastName { get; set; }
     }
 }
