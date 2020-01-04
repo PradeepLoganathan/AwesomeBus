@@ -28,7 +28,7 @@ namespace AwesomeBus.Publisher
             
            
 
-            #region NServiceBusIntegration
+            #region NServiceBus-Configuration
             var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Publisher");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
@@ -42,7 +42,7 @@ namespace AwesomeBus.Publisher
             endpointConfiguration.SendOnly();
             endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
-            var connection = @"Data Source=.\SqlExpress;Database=NsbpubsubSqlOutbox;Integrated Security=True;Max Pool Size=100";
+            var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=NsbpubsubSqlOutbox;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.ConnectionBuilder(
                 connectionBuilder: () =>
@@ -50,8 +50,10 @@ namespace AwesomeBus.Publisher
                     return new SqlConnection(connection);
                 });
             var dialect = persistence.SqlDialect<SqlDialect.MsSqlServer>();
-            dialect.Schema("sender");
+            dialect.Schema("senderpublisher");
             persistence.TablePrefix("");
+            var subscriptions = persistence.SubscriptionSettings();
+            subscriptions.DisableCache();
 
             var routing = transport.Routing();
             routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerCommandQueue");
@@ -61,7 +63,7 @@ namespace AwesomeBus.Publisher
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
             #endregion
 
-            #region sendcommand
+            #region CreateCustomerCommand
 
             await Task.Delay(2000);
 
@@ -73,15 +75,17 @@ namespace AwesomeBus.Publisher
 
             await endpointInstance.Send(createCustomerCommand);            
             WriteToConsole($"Fired {nameof(ICreateCustomerCommand)}", ConsoleColor.Yellow);
+            #endregion
 
-            var createOrderCommand = new CreateOrderCommand
-            {
-                OrderID = Guid.NewGuid(),
-                OrderDate = DateTime.UtcNow
-            };
+            #region CreateorderCommand
+            //var createOrderCommand = new CreateOrderCommand
+            //{
+            //    OrderID = Guid.NewGuid(),
+            //    OrderDate = DateTime.UtcNow
+            //};
 
-            await endpointInstance.Send(createOrderCommand);
-            WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
+            //await endpointInstance.Send(createOrderCommand);
+            //WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
             #endregion
 
             WriteToConsole("Publisher Endpoint started ..... Press any key to exit", ConsoleColor.Yellow);
