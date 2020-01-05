@@ -23,11 +23,8 @@ namespace AwesomeBus.Publisher
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
-            #endregion
-
-            
+            #endregion          
            
-
             #region NServiceBus-Configuration
             var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Publisher");
             endpointConfiguration.EnableInstallers();
@@ -65,27 +62,26 @@ namespace AwesomeBus.Publisher
 
             #region CreateCustomerCommand
 
-            await Task.Delay(2000);
 
-            var createCustomerCommand = new CreateCustomerCommand
-            {
-                FirstName = "test",
-                LastName = "lastnametest"
-            };
+            //var createCustomerCommand = new CreateCustomerCommand
+            //{
+            //    FirstName = "test",
+            //    LastName = "lastnametest"
+            //};
 
-            await endpointInstance.Send(createCustomerCommand);            
-            WriteToConsole($"Fired {nameof(ICreateCustomerCommand)}", ConsoleColor.Yellow);
+            //await endpointInstance.Send(createCustomerCommand);            
+            //WriteToConsole($"Fired {nameof(ICreateCustomerCommand)}", ConsoleColor.Yellow);
             #endregion
 
             #region CreateorderCommand
-            //var createOrderCommand = new CreateOrderCommand
-            //{
-            //    OrderID = Guid.NewGuid(),
-            //    OrderDate = DateTime.UtcNow
-            //};
+            var createOrderCommand = new CreateOrderCommand
+            {
+                OrderID = Guid.NewGuid(),
+                OrderDate = DateTime.UtcNow
+            };
 
-            //await endpointInstance.Send(createOrderCommand);
-            //WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
+            await endpointInstance.Send(createOrderCommand);
+            WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
             #endregion
 
             WriteToConsole("Publisher Endpoint started ..... Press any key to exit", ConsoleColor.Yellow);

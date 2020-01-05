@@ -25,7 +25,7 @@ namespace AwesomeBus.OrderWorker
             #endregion
 
             #region NServiceBusIntegration
-            var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=NsbpubsubSqlOutbox;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=OrderWorkerDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             var endpointConfiguration = new EndpointConfiguration("AwesomeBus.OrderCommandQueue");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
@@ -37,6 +37,7 @@ namespace AwesomeBus.OrderWorker
             
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.ConnectionBuilder(
