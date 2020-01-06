@@ -77,7 +77,13 @@ namespace AwesomeBus.Publisher
             var createOrderCommand = new CreateOrderCommand
             {
                 OrderID = Guid.NewGuid(),
-                OrderDate = DateTime.UtcNow
+                OrderData = new OrderData() 
+                { 
+                    OrderDateTime = DateTime.UtcNow.ToLongDateString(), 
+                    OrderItem = "Dell XPS", 
+                    Quantity = 1, 
+                    TotalPrice = 2356.18
+                }
             };
 
             await endpointInstance.Send(createOrderCommand);
