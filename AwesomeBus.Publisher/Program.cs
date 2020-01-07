@@ -15,7 +15,8 @@ namespace AwesomeBus.Publisher
     {
         static async Task Main(string[] args)
         {
-            Console.Title = "Awesome.Bus.Publisher";
+            string AssemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+            Console.Title = AssemblyName;
 
             #region configuration
             IConfiguration Configuration = new ConfigurationBuilder()
@@ -39,6 +40,12 @@ namespace AwesomeBus.Publisher
             endpointConfiguration.SendOnly();
             endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
+            //endpointConfiguration.SendHeartbeatTo(
+
+            //        serviceControlQueue: "ServiceControl_Queue",
+            //        frequency: TimeSpan.FromSeconds(15),
+            //        timeToLive: TimeSpan.FromSeconds(30));
+
             var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=NsbpubsubSqlOutbox;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.ConnectionBuilder(
@@ -53,11 +60,11 @@ namespace AwesomeBus.Publisher
             subscriptions.DisableCache();
 
             var routing = transport.Routing();
-            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerCommandQueue");
-            routing.RouteToEndpoint(typeof(CreateOrderCommand), "AwesomeBus.OrderCommandQueue");
+            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerEndpoint");
+            routing.RouteToEndpoint(typeof(CreateOrderCommand), "AwesomeBus.OrderEndpoint");
 
             endpointConfiguration.EnableOutbox();
-            var endpointInstance = await Endpoint.Start(endpointConfiguration);
+            var endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
             #endregion
 
             #region CreateCustomerCommand

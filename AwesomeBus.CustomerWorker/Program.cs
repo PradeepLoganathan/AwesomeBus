@@ -27,7 +27,7 @@ namespace AwesomeBus.CustomerWorker
 
             #region NServiceBusIntegration
             var connection = @"Data Source=.\SqlExpress;Database=NsbpubsubSqlOutbox;Integrated Security=True;Max Pool Size=100";
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.CustomerCommandQueue");
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.CustomerEndpoint");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 

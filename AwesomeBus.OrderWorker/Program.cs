@@ -26,7 +26,7 @@ namespace AwesomeBus.OrderWorker
 
             #region NServiceBusIntegration
             var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=OrderWorkerDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.OrderCommandQueue");
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.OrderEndpoint");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 

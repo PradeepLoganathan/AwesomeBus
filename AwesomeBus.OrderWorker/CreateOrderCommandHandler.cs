@@ -1,6 +1,7 @@
 ﻿using AwesomeBus.MessageContracts;
 using Newtonsoft.Json;
 using NServiceBus;
+using NServiceBus.Logging;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -11,9 +12,12 @@ namespace AwesomeBus.OrderWorker
 {
     class CreateOrderCommandHandler : IHandleMessages<CreateOrderCommand>
     {
+        readonly ILog log = LogManager.GetLogger<CreateOrderCommandHandler>();
+
         public async Task Handle(CreateOrderCommand message, IMessageHandlerContext context)
         {   
             WriteToConsole($"Handler fired for {nameof(CreateOrderCommand)} {message.OrderID}", ConsoleColor.DarkBlue);
+            log.Info($"Handler fired for {nameof(CreateOrderCommand)} {message.OrderID}");
 
             #region database-updates
             //write the order to the database
@@ -41,7 +45,7 @@ namespace AwesomeBus.OrderWorker
                 
             }
 
-            //throw new Exception();
+            throw new Exception();
             #endregion
 
             #region fireevent
