@@ -34,8 +34,8 @@ namespace AwesomBus.ThirdSubscriber
             endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
             var routing = transport.Routing();
-            routing.RegisterPublisher(typeof(CustomerCreatedEvent), publisherEndpoint: "AwesomeBus.CustomerCommandQueue");
-            routing.RegisterPublisher(typeof(OrderCreatedEvent), publisherEndpoint: "AwesomeBus.OrderCommandQueue");
+            routing.RegisterPublisher(typeof(CustomerCreatedEvent), publisherEndpoint: "AwesomeBus.CustomerEndpoint");
+            routing.RegisterPublisher(typeof(OrderCreatedEvent), publisherEndpoint: "AwesomeBus.OrderEndpoint");
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
 

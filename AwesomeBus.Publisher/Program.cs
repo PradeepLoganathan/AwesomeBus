@@ -15,7 +15,8 @@ namespace AwesomeBus.Publisher
     {
         static async Task Main(string[] args)
         {
-            Console.Title = "Awesome.Bus.Publisher";
+            string AssemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+            Console.Title = AssemblyName;
 
             #region configuration
             IConfiguration Configuration = new ConfigurationBuilder()
@@ -23,12 +24,9 @@ namespace AwesomeBus.Publisher
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
-            #endregion
-
-            
+            #endregion          
            
-
-            #region NServiceBusIntegration
+            #region NServiceBus-Configuration
             var endpointConfiguration = new EndpointConfiguration("AwesomeBus.Publisher");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
@@ -42,7 +40,13 @@ namespace AwesomeBus.Publisher
             endpointConfiguration.SendOnly();
             endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
 
-            var connection = @"Data Source=.\SqlExpress;Database=NsbpubsubSqlOutbox;Integrated Security=True;Max Pool Size=100";
+            //endpointConfiguration.SendHeartbeatTo(
+
+            //        serviceControlQueue: "ServiceControl_Queue",
+            //        frequency: TimeSpan.FromSeconds(15),
+            //        timeToLive: TimeSpan.FromSeconds(30));
+
+            var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=NsbpubsubSqlOutbox;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.ConnectionBuilder(
                 connectionBuilder: () =>
@@ -50,38 +54,55 @@ namespace AwesomeBus.Publisher
                     return new SqlConnection(connection);
                 });
             var dialect = persistence.SqlDialect<SqlDialect.MsSqlServer>();
-            dialect.Schema("sender");
+            dialect.Schema("senderpublisher");
             persistence.TablePrefix("");
+            var subscriptions = persistence.SubscriptionSettings();
+            subscriptions.DisableCache();
 
             var routing = transport.Routing();
-            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerCommandQueue");
-            routing.RouteToEndpoint(typeof(CreateOrderCommand), "AwesomeBus.OrderCommandQueue");
+            routing.RouteToEndpoint(typeof(CreateCustomerCommand), "AwesomeBus.CustomerEndpoint");
+            routing.RouteToEndpoint(typeof(CreateOrderCommand), "AwesomeBus.OrderEndpoint");
 
             endpointConfiguration.EnableOutbox();
-            var endpointInstance = await Endpoint.Start(endpointConfiguration);
+            var endpointInstance = await Endpoint.Start(endpointConfiguration).ConfigureAwait(false);
             #endregion
 
-            #region sendcommand
+            #region CreateCustomerCommand
 
-            await Task.Delay(2000);
 
-            var createCustomerCommand = new CreateCustomerCommand
+            //var createCustomerCommand = new CreateCustomerCommand
+            //{
+            //    FirstName = "test",
+            //    LastName = "lastnametest"
+            //};
+
+            //await endpointInstance.Send(createCustomerCommand);            
+            //WriteToConsole($"Fired {nameof(ICreateCustomerCommand)}", ConsoleColor.Yellow);
+            #endregion
+
+            #region CreateorderCommand
+            
+            for (int i = 0; i < 10; i++)
             {
-                FirstName = "test",
-                LastName = "lastnametest"
-            };
+                Random PriceRandomizer = new Random(Guid.NewGuid().GetHashCode());
+                Random QuantityRandomizer = new Random(Guid.NewGuid().GetHashCode());
+                int price = PriceRandomizer.Next(2000, 15000);
+                int quantity = QuantityRandomizer.Next(1, 10);
+                var createOrderCommand = new CreateOrderCommand
+                {
+                    OrderID = Guid.NewGuid(),
+                    OrderData = new OrderData()
+                    {
+                        OrderDateTime = DateTime.UtcNow.ToLongDateString(),
+                        OrderItem = "Youi Life insurance policy",
+                        Quantity = quantity,
+                        TotalPrice = price
+                    }
+                };
 
-            await endpointInstance.Send(createCustomerCommand);            
-            WriteToConsole($"Fired {nameof(ICreateCustomerCommand)}", ConsoleColor.Yellow);
-
-            var createOrderCommand = new CreateOrderCommand
-            {
-                OrderID = Guid.NewGuid(),
-                OrderDate = DateTime.UtcNow
-            };
-
-            await endpointInstance.Send(createOrderCommand);
-            WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
+                await endpointInstance.Send(createOrderCommand);
+                WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
+            }
             #endregion
 
             WriteToConsole("Publisher Endpoint started ..... Press any key to exit", ConsoleColor.Yellow);

@@ -13,7 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwesomeBus.OrderWorker", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwesomeBus.CustomerWorker", "AwesomeBus.CustomerWorker\AwesomeBus.CustomerWorker.csproj", "{22B27A8F-74BB-4B5B-A765-7250312BA68B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwesomeBus.Helper", "AwesomeBus.Helper\AwesomeBus.Helper.csproj", "{1E551D04-A5CD-458F-B81D-AC6A6547FFC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AwesomeBus.Helper", "AwesomeBus.Helper\AwesomeBus.Helper.csproj", "{1E551D04-A5CD-458F-B81D-AC6A6547FFC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Publisher", "Publisher", "{76759253-8496-428F-AFF1-D01407EF42B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{2DFB96F7-7E3B-42AB-A577-EF18D637DC0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{5F73857D-0381-43E6-A56C-C815FA73BCD7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{7DA4D952-7D24-47AC-B3E1-EA4A3451AD27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,6 +108,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B8D19289-7617-4DB9-9995-52052EC76655} = {76759253-8496-428F-AFF1-D01407EF42B4}
+		{2190B592-B23C-44F4-B6D0-1030CFAF45CF} = {7DA4D952-7D24-47AC-B3E1-EA4A3451AD27}
+		{39694FF4-958B-41F4-9106-556D9E787C63} = {2DFB96F7-7E3B-42AB-A577-EF18D637DC0F}
+		{69053F67-C936-4413-A025-B3CB039C949A} = {2DFB96F7-7E3B-42AB-A577-EF18D637DC0F}
+		{22B27A8F-74BB-4B5B-A765-7250312BA68B} = {2DFB96F7-7E3B-42AB-A577-EF18D637DC0F}
+		{1E551D04-A5CD-458F-B81D-AC6A6547FFC2} = {5F73857D-0381-43E6-A56C-C815FA73BCD7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {07DA7B8C-F06C-42E0-8C05-C1C1F2089439}

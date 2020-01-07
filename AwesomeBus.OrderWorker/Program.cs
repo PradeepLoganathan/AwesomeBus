@@ -2,7 +2,10 @@
 using AwesomeBus.MessageContracts;
 using Microsoft.Extensions.Configuration;
 using NServiceBus;
+using NServiceBus.Persistence.Sql;
 using System;
+using System.Data.SqlClient;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace AwesomeBus.OrderWorker
@@ -22,7 +25,8 @@ namespace AwesomeBus.OrderWorker
             #endregion
 
             #region NServiceBusIntegration
-            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.OrderCommandQueue");
+            var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Database=OrderWorkerDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var endpointConfiguration = new EndpointConfiguration("AwesomeBus.OrderEndpoint");
             endpointConfiguration.EnableInstallers();
             var transport = endpointConfiguration.UseTransport<SqsTransport>();
 
@@ -30,10 +34,28 @@ namespace AwesomeBus.OrderWorker
 
             transport.ClientFactory(() => Configuration.GetAWSOptions().CreateServiceClient<IAmazonSQS>());
 
-            //endpointConfiguration.UsePersistence<InMemoryPersistence>();
-            transport.DisablePublishing();
+            
             endpointConfiguration.AuditProcessedMessagesTo("AwesomeBus-audit");
             endpointConfiguration.SendFailedMessagesTo("AwesomeBus-error");
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+            var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+            persistence.ConnectionBuilder(
+                connectionBuilder: () =>
+                {
+                    return new SqlConnection(connection);
+                });
+            var dialect = persistence.SqlDialect<SqlDialect.MsSqlServer>();
+            dialect.Schema("orderworker");
+            persistence.TablePrefix("");
+            var subscriptions = persistence.SubscriptionSettings();
+            subscriptions.DisableCache();
+
+            endpointConfiguration.EnableOutbox();
+
+           // SqlHelper.CreateSchema(connection, "orderworker");
+
+            //SqlHelper.ExecuteSql(connection, File.ReadAllText("Startup.sql"));
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration);
 
