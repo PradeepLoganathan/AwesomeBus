@@ -45,7 +45,7 @@ namespace AwesomeBus.OrderWorker
                 
             }
 
-            throw new Exception();
+            //throw new Exception();
             #endregion
 
             #region fireevent

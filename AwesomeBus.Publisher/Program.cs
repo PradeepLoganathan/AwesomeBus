@@ -81,20 +81,28 @@ namespace AwesomeBus.Publisher
             #endregion
 
             #region CreateorderCommand
-            var createOrderCommand = new CreateOrderCommand
+            
+            for (int i = 0; i < 10; i++)
             {
-                OrderID = Guid.NewGuid(),
-                OrderData = new OrderData() 
-                { 
-                    OrderDateTime = DateTime.UtcNow.ToLongDateString(), 
-                    OrderItem = "Dell XPS", 
-                    Quantity = 1, 
-                    TotalPrice = 2356.18
-                }
-            };
+                Random PriceRandomizer = new Random(Guid.NewGuid().GetHashCode());
+                Random QuantityRandomizer = new Random(Guid.NewGuid().GetHashCode());
+                int price = PriceRandomizer.Next(2000, 15000);
+                int quantity = QuantityRandomizer.Next(1, 10);
+                var createOrderCommand = new CreateOrderCommand
+                {
+                    OrderID = Guid.NewGuid(),
+                    OrderData = new OrderData()
+                    {
+                        OrderDateTime = DateTime.UtcNow.ToLongDateString(),
+                        OrderItem = "Youi Life insurance policy",
+                        Quantity = quantity,
+                        TotalPrice = price
+                    }
+                };
 
-            await endpointInstance.Send(createOrderCommand);
-            WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
+                await endpointInstance.Send(createOrderCommand);
+                WriteToConsole($"Fired {nameof(CreateOrderCommand)}", ConsoleColor.Yellow);
+            }
             #endregion
 
             WriteToConsole("Publisher Endpoint started ..... Press any key to exit", ConsoleColor.Yellow);
